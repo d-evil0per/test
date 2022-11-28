@@ -15,26 +15,28 @@ import Favorite from "@mui/icons-material/Favorite";
 
 
 
+
 const MovieCard = (props) => {
     // const navigate = useNavigate();
     // const OpenMovie =(title)=>{
     //     navigate("/title");
+    //const navigate = useNavigate();
     // }
-    const removeFav =() =>{
+    const removeFav =(movie) =>{
         if(props.currPage==='favourite'){
         return(
-            <p onClick={props.handleRemove()}> Remove Favorite </p>
+            <p onClick={()=>{props.handleRemove(movie)}}> Remove Favorite </p>
         )
         }
         else{
             return(
-                <p>Add to Favourites <FavoriteIcon fontSize="small" sx={{ color: pink[500]}} /></p>
+                <p onClick={()=>props.handlefav(movie)}>Add to Favourites <FavoriteIcon fontSize="small" sx={{ color: pink[500]}} /></p>
             )
         }
     }
-    const showFav =() =>{
+    const showFav =(movie) =>{
         return(
-            <p>Add to Favourites <FavoriteIcon fontSize="small" sx={{ color: pink[500]}} /></p>
+            <p onClick={()=>props.handlefav(movie)}>Add to Favourites <FavoriteIcon fontSize="small" sx={{ color: pink[500]}} /></p>
         )
     }
     return (
@@ -53,18 +55,18 @@ const MovieCard = (props) => {
         }}
       >
                 {props.movies.map((movie, index) => (
-                    <Card key ={ movie.id} sx={{ width: 200, height: 300, display:'flex', flexDirection:'row'}}>
+                    <Card key ={index}  sx={{ width: 200, height: 300, display:'flex', flexDirection:'row'}}>
                         <CardActionArea>
                             <CardMedia
                                 component="img"
                                 height="200"
                                 image={movie.posterurl}
-                                // onClick={()=>OpenMovie(movie.title)}
+                                //onClick={()=>navigate("/MovieInfo")}
                             />
                             <CardContent sx={{ display: 'flex', flexDirection: 'column' }}>
                                 <h6>{movie.title}</h6>
-                                <div onClick={()=>props.handlefav(movie)}>
-                                    { (props.isFav) ? removeFav() : showFav()}
+                                <div >
+                                    { (props.isFav) ? removeFav(movie) : showFav(movie)}
                                     {/* <p>Add to Favourites <FavoriteIcon fontSize="small" sx={{ color: pink[500]}} /></p> */}
                                     
                                 </div>

@@ -9,15 +9,15 @@ import SearchIcon from '@mui/icons-material/Search';
 import MovieCard from './components/MovieCard/MovieCard';
 import 'react-toastify/dist/ReactToastify.css';
 import { ToastContainer, toast } from 'react-toastify';
-
-
-
-
+import Favorite from '@mui/icons-material/Favorite';
+import {BrowserRouter,Routes,Route} from "react-router-dom";
+import MovieInfo from "./components/MovieInfo/Movieinfo";
 
 function App() {
   const [movies, setMovies] = useState([]);
   const [isFav, setIsFav] = useState(false);
   const [currPage, setCurrPage] = useState('');
+
   // const [value, setValue]=useState('');
 
   const getMovie = async (type) => {
@@ -44,6 +44,7 @@ function App() {
       case "favourite":
         url = `http://localhost:3000/favourite`;
         setCurrPage('favourite')
+        setIsFav(true)
         break;
       default:
         break;
@@ -71,56 +72,82 @@ function App() {
   }
 
   const handlefav = (movie) => {
-    const url = `http://localhost:3000/favourite`;
+    const url = `http://localhost:3000/favourite/`;
     fetch(url, {
       method: 'POST',
       headers: { 'Content-type': 'application/json' },
-      body: JSON.stringify(movie),
+      body: JSON.stringify(movie)
     })
       .then(res => res.json())
       .then(
         data => setMovies(prevState => [...prevState, data]),
         error => console.log(error.message)
       );
-    toast.success("Added to favourite");
+    toast.success("Added to Favourite");
     setIsFav(true);
   }
-  const handleRemove=(movie) => {
-    const url = `http://localhost:3000/favourite`;
-    const response = await fetch(url);
-    const responseJson = await response.json();
- 
+  const handleRemove = async (movie) => {
+    // const url = `http://localhost:3000/favourite`;
+    // const response = await fetch(url);
+    // const responseJson = await response.json();
+    // const newArray = responseJson.filter((fav, index) => {
+    //   return (fav.title != movie.title)
+
+    // })
+    fetch("http://localhost:3000/favourite/" + movie.id, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(movie)
+    })
+      .then(res => res.json())
+      .then(
+        data => setMovies(prevState => [...prevState, data]),
+        error => console.log(error.message)
+      );
+    toast.info("remove from Favourite");
+    setIsFav(false);
+    getMovie(currPage)
+    // console.log(newArray)
   }
 
   useEffect(() => {
     getMovie("movies-coming");
   }, []);
   return (
+    <><>
+      <BrowserRouter>
+        <Routes>
+          <Route exact path="/info" element={<MovieInfo />} />
+        </Routes>
+      </BrowserRouter>
+    </>
     <div className="App">
-      <Navbar className='navbar'>
-        <Container fluid style={{background:'white'}}>
-          <Nav className="me-auto" style={{gap:'5px',padding:'6px 0 0 0'}} c>
-            <Nav.Link className='navlink' onClick={() => { getMovie("movies-coming") }} >Movies in Theater</Nav.Link>
-            <Nav.Link className='navlink' onClick={() => { getMovie("movies-in-theaters") }} >Coming Soon</Nav.Link>
-            <Nav.Link className='navlink' onClick={() => { getMovie("top-rated-india") }}>Top rated Indian</Nav.Link>
-            <Nav.Link className='navlink' onClick={() => { getMovie("top-rated-movies") }}>Top rated movies</Nav.Link>
-            <Nav.Link className='navlink' onClick={() => { getMovie("favourite") }}>Favourites</Nav.Link>
-          </Nav>
-          <Form style={{ marginRight: '2px' }}>
-            <Form.Group className="mr-5">
+        <Navbar className='navbar'>
+          <Container fluid style={{ background: 'white' }}>
+            <Nav className="me-auto" style={{ gap: '5px', padding: '6px 0 0 0' }} c>
+              <Nav.Link className='navlink' onClick={() => { getMovie("movies-coming"); } }>Movies in Theater</Nav.Link>
+              <Nav.Link className='navlink' onClick={() => { getMovie("movies-in-theaters"); } }>Coming Soon</Nav.Link>
+              <Nav.Link className='navlink' onClick={() => { getMovie("top-rated-india"); } }>Top rated Indian</Nav.Link>
+              <Nav.Link className='navlink' onClick={() => { getMovie("top-rated-movies"); } }>Top rated movies</Nav.Link>
+              <Nav.Link className='navlink' onClick={() => { getMovie("favourite"); } }>Favourites</Nav.Link>
+            </Nav>
+            <Form style={{ marginRight: '2px' }}>
+              <Form.Group className="mr-5">
 
-              <Form.Control onChange={(e) => search(e.target.value)} type="email" placeholder="Search Movie" />
+                <Form.Control onChange={(e) => search(e.target.value)} type="email" placeholder="Search Movie" />
 
-            </Form.Group>
-          </Form>
-          <SearchIcon style={{justifyContent:'center'}} color="primary" />
-        </Container>
-      </Navbar>
-      <ToastContainer />
-      <MovieCard movies={movies} handlefav={handlefav} isFav={isFav}  currPage ={currPage}/>
+              </Form.Group>
+            </Form>
+            <SearchIcon style={{ justifyContent: 'center' }} color="primary" />
+          </Container>
+        </Navbar>
+        <ToastContainer />
+        <MovieCard movies={movies} handlefav={handlefav} isFav={isFav} currPage={currPage} handleRemove={handleRemove} />
 
 
-    </div>
+      </div></>
   );
 }
 
